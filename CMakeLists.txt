@@ -56,28 +56,41 @@ ament_auto_add_library(rviz_viewer SHARED
 )
 
 ### glim_rosnode ###
+# NOTE (launchpad): disabled. As an executable it fully resolves symbols at link
+# and pulls ROS gtsam (TBB 4.2) via ament, clashing with the notbb gtsam stack.
+# slam/glim.launch.py loads the glim::GlimROS composable-node plugin from
+# libglim_ros.so, so the standalone node binary is not required.
+if(FALSE)
 ament_auto_add_executable(glim_rosnode
   src/glim_rosnode.cpp
 )
 target_link_libraries(glim_rosnode
   glim_ros
 )
+endif()
 
-### glim_rosbag ###
-ament_auto_add_executable(glim_rosbag
-  src/glim_rosbag.cpp
-)
-target_link_libraries(glim_rosbag
-  glim_ros
-)
+# NOTE (launchpad): glim_rosbag/validator_node/viewers disabled. They pull the
+# ROS gtsam (TBB 4.2) into the link line via ament, conflicting with the notbb
+# gtsam stack GLIM is built against. Only the glim_ros composable-node plugin +
+# glim_rosnode are needed for slam/glim.launch.py.
 
-### validator_node ###
-ament_auto_add_executable(validator_node
-  src/validator_node.cpp
-)
-target_link_libraries(validator_node
-  glim_ros
-)
+if(FALSE)
+  ### glim_rosbag ###
+  ament_auto_add_executable(glim_rosbag
+    src/glim_rosbag.cpp
+  )
+  target_link_libraries(glim_rosbag
+    glim_ros
+  )
+
+  ### validator_node ###
+  ament_auto_add_executable(validator_node
+    src/validator_node.cpp
+  )
+  target_link_libraries(validator_node
+    glim_ros
+  )
+endif()
 
 if(BUILD_WITH_VIEWER)
   ### offline_viewer ###
